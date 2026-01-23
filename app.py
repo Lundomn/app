@@ -103,44 +103,42 @@ st.markdown("""
     .card-value { font-size: 42px; font-weight: bold; line-height: 1.1; margin: 2px 0; text-shadow: 0 0 8px currentColor; }
     .card-unit { font-size: 12px; opacity: 0.8; line-height: 1.2; }
     
-    /* 5. 按钮样式 (【修改点】增强对比度) */
+    /* 5. 按钮样式修复 【核心修复区域】 */
+    /* 针对所有按钮的基础样式 */
     div.stButton > button {
         width: 100%;
         border-radius: 8px;
         height: 45px;
         font-weight: bold;
         font-size: 16px;
-        border: none;
         transition: all 0.3s ease;
     }
 
-    /* 左侧 START 按钮：绿色背景 + 白色文字 */
-    div[data-testid="column"]:nth-of-type(1) button {
-        background-color: #1b5e20; /* 深绿色背景 */
-        color: #ffffff !important; /* 强制纯白文字 */
-        border: 1px solid #4caf50; /* 亮绿边框 */
+    /* 左侧 START 按钮：强制深绿背景，白字 */
+    div[data-testid="column"]:nth-of-type(1) .stButton > button {
+        background-color: #006400 !important; /* 深绿色 */
+        color: #FFFFFF !important;            /* 纯白色文字 */
+        border: 1px solid #00FF00 !important; /* 亮绿边框 */
     }
-    div[data-testid="column"]:nth-of-type(1) button:hover {
-        background-color: #2e7d32;
-        border-color: #66bb6a;
-        color: #ffffff !important;
+    div[data-testid="column"]:nth-of-type(1) .stButton > button:hover {
+        background-color: #008000 !important;
+        box-shadow: 0 0 10px rgba(0,255,0,0.4);
     }
 
-    /* 右侧 STOP 按钮：红色背景 + 白色文字 */
-    div[data-testid="column"]:nth-of-type(2) button {
-        background-color: #b71c1c; /* 深红色背景 */
-        color: #ffffff !important; /* 强制纯白文字 */
-        border: 1px solid #f44336; /* 亮红边框 */
+    /* 右侧 STOP 按钮：强制深红背景，白字 */
+    div[data-testid="column"]:nth-of-type(2) .stButton > button {
+        background-color: #8B0000 !important; /* 深红色 */
+        color: #FFFFFF !important;            /* 纯白色文字 */
+        border: 1px solid #FF0000 !important; /* 亮红边框 */
     }
-    div[data-testid="column"]:nth-of-type(2) button:hover {
-        background-color: #c62828;
-        border-color: #ef5350;
-        color: #ffffff !important;
+    div[data-testid="column"]:nth-of-type(2) .stButton > button:hover {
+        background-color: #B22222 !important;
+        box-shadow: 0 0 10px rgba(255,0,0,0.4);
     }
     
     /* 6. 状态文字 */
     .status-text {
-        color: #bbbbbb; /* 浅灰色文字，比之前更亮一点 */
+        color: #bbbbbb; 
         text-align: left;
         font-size: 14px;
         margin-bottom: 5px;
