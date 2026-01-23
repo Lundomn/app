@@ -7,7 +7,7 @@ import random
 import pandas as pd
 import altair as alt
 
-# --- 1. 数据处理部分 (保持不变) ---
+# --- 1. 数据处理部分 ---
 def sort_by_time(filename):
     try:
         parts = filename.replace('.mat', '').split('-')
@@ -41,22 +41,22 @@ def load_all_data(data_folder):
             return np.array(all_x_list)
     return np.sin(np.linspace(0, 100, 10000)) + np.random.normal(0, 0.2, 10000)
 
-# --- 2. 界面样式配置 (【核心修改：暗黑医疗配色】) ---
+# --- 2. 界面样式配置 ---
 st.set_page_config(page_title="SCG Monitor", layout="centered")
 
 st.markdown("""
 <style>
     /* 1. 强制全局深色背景 */
     .stApp {
-        background-color: #0E1117; /* 深灰/黑背景 */
+        background-color: #0E1117;
         color: #FAFAFA;
     }
     
-    /* 2. 标题文字颜色 */
+    /* 2. 标题文字 */
     .header-text {
         font-size: 20px; 
         font-weight: 600;
-        color: #E0E0E0; /* 浅灰白 */
+        color: #E0E0E0; 
         margin-bottom: 0px; 
         padding-top: 10px;
         display: flex;
@@ -78,7 +78,7 @@ st.markdown("""
         border-radius: 12px;
         padding: 10px;
         text-align: center;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.3); /* 更深的阴影 */
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         height: 140px; 
         display: flex;
         flex-direction: column;
@@ -89,52 +89,58 @@ st.markdown("""
         min-width: 120px;
     }
 
-    /* 4. SBP 卡片 (暗红底 + 亮红字) */
+    /* 4. SBP/DBP 卡片样式 */
     .card-sbp {
-        background-color: #2b0c0c; /* 极深的红色背景 */
-        border: 1px solid #8a2be2; /* 甚至可以用紫色或深红边框 */
-        border: 1px solid #ff4b4b; /* 亮红边框 */
+        background-color: #2b0c0c; 
+        border: 1px solid #ff4b4b; 
     }
-    
-    /* 5. DBP 卡片 (暗绿底 + 荧光绿字) */
     .card-dbp {
-        background-color: #0c2b10; /* 极深的绿色背景 */
-        border: 1px solid #00ff00; /* 荧光绿边框 */
+        background-color: #0c2b10; 
+        border: 1px solid #00ff00; 
     }
 
     .card-title { font-size: 18px; font-weight: bold; margin-bottom: 0px; }
     .card-value { font-size: 42px; font-weight: bold; line-height: 1.1; margin: 2px 0; text-shadow: 0 0 8px currentColor; }
     .card-unit { font-size: 12px; opacity: 0.8; line-height: 1.2; }
     
-    /* 6. 按钮样式 (深灰色) */
+    /* 5. 按钮样式 (【修改点】增强对比度) */
     div.stButton > button {
         width: 100%;
         border-radius: 8px;
         height: 45px;
         font-weight: bold;
-        border: 1px solid #444;
+        font-size: 16px;
+        border: none;
+        transition: all 0.3s ease;
     }
+
+    /* 左侧 START 按钮：绿色背景 + 白色文字 */
     div[data-testid="column"]:nth-of-type(1) button {
-        background-color: #262730; /* 深灰按钮 */
-        color: #FFF;
+        background-color: #1b5e20; /* 深绿色背景 */
+        color: #ffffff !important; /* 强制纯白文字 */
+        border: 1px solid #4caf50; /* 亮绿边框 */
     }
     div[data-testid="column"]:nth-of-type(1) button:hover {
-        border-color: #FFF;
-        color: #FFF;
+        background-color: #2e7d32;
+        border-color: #66bb6a;
+        color: #ffffff !important;
     }
+
+    /* 右侧 STOP 按钮：红色背景 + 白色文字 */
     div[data-testid="column"]:nth-of-type(2) button {
-        background-color: #1f3a5f; /* 深蓝按钮 */
-        color: #4da6ff;
-        border: 1px solid #1f3a5f;
+        background-color: #b71c1c; /* 深红色背景 */
+        color: #ffffff !important; /* 强制纯白文字 */
+        border: 1px solid #f44336; /* 亮红边框 */
     }
     div[data-testid="column"]:nth-of-type(2) button:hover {
-        background-color: #2a4b7a;
-        color: #FFF;
+        background-color: #c62828;
+        border-color: #ef5350;
+        color: #ffffff !important;
     }
     
-    /* 7. 进度条文字修正 */
+    /* 6. 状态文字 */
     .status-text {
-        color: #aaaaaa;
+        color: #bbbbbb; /* 浅灰色文字，比之前更亮一点 */
         text-align: left;
         font-size: 14px;
         margin-bottom: 5px;
@@ -159,7 +165,6 @@ st.markdown("<br>", unsafe_allow_html=True)
 cards_placeholder = st.empty() 
 
 def render_cards(sbp, dbp):
-    # 修改了这里的内联样式，使用 CSS 类控制，颜色改为荧光色
     html_code = f"""
     <div class="cards-container">
         <div class="bp-card card-sbp">
@@ -176,14 +181,12 @@ def render_cards(sbp, dbp):
     """
     cards_placeholder.markdown(html_code, unsafe_allow_html=True)
 
-# 初始数值
 render_cards(120, 70)
 
 st.markdown("<br>", unsafe_allow_html=True)
 info_text_placeholder = st.empty()
 progress_bar = st.empty()
 
-# 初始文字显示 (改为浅色字体)
 info_text_placeholder.markdown(
     f"<div class='status-text'>Waiting for <b>No.{st.session_state.measure_count}</b> measurements.</div>", 
     unsafe_allow_html=True
@@ -207,22 +210,22 @@ if stop_clicked:
 if st.session_state.running:
     # --- SCG 波形设置 ---
     window_size = 1000 
-    step = 10           # 保持大步长
-    sleep_time = 0.01   # 保持低延迟
+    step = 30           
+    sleep_time = 0.01   
     
     # --- 血压更新设置 ---
     cycle_duration = 2.5 
     cycle_start_time = time.time() 
     
-    # 【图表配置：纯黑背景 + 荧光绿线】
+    # 图表配置
     base = alt.Chart(pd.DataFrame({'index':[], 'SCG':[]})).mark_line(
-        color="#00FF00",  # 典型的医用监护仪荧光绿
+        color="#00FF00", 
         strokeWidth=2     
     ).encode(
         x=alt.X('index', axis=None), 
         y=alt.Y('SCG', axis=alt.Axis(
             grid=True,          
-            gridColor='#333333',# 很暗的灰色网格
+            gridColor='#333333',
             tickCount=5,        
             labels=False,       
             domain=False,       
@@ -230,7 +233,7 @@ if st.session_state.running:
         ), scale=alt.Scale(domain=[-0.05, 0.05]))
     ).properties(
         height=180,
-        background='#000000' # 图表区域纯黑
+        background='#000000' 
     ).configure_view(
         strokeWidth=0        
     )
@@ -239,7 +242,7 @@ if st.session_state.running:
         if not st.session_state.running:
             break
             
-        # A: 渲染波形 (原始信号)
+        # A: 渲染波形
         batch_data = all_x[i : i + window_size]
         chart_data = pd.DataFrame({
             "SCG": batch_data, 
@@ -270,4 +273,3 @@ if st.session_state.running:
         
         progress_bar.progress(min(progress_ratio, 1.0))
         time.sleep(sleep_time)
-
