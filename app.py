@@ -103,9 +103,8 @@ st.markdown("""
     .card-value { font-size: 42px; font-weight: bold; line-height: 1.1; margin: 2px 0; text-shadow: 0 0 8px currentColor; }
     .card-unit { font-size: 12px; opacity: 0.8; line-height: 1.2; }
     
-    /* 5. 按钮样式修复 【核心修改：白底黑字】 */
+    /* 5. 按钮样式 (白底黑字) */
     
-    /* 所有按钮的基础样式：白底、黑字、加粗 */
     div.stButton > button {
         background-color: #FFFFFF !important; /* 强制白底 */
         color: #000000 !important;            /* 强制黑字 */
@@ -114,15 +113,15 @@ st.markdown("""
         height: 45px;
         font-weight: bold;
         font-size: 16px;
-        border: 2px solid transparent !important; /* 预留边框位置 */
+        border: 2px solid transparent !important; 
         transition: all 0.3s ease;
     }
 
     /* 左侧 START 按钮：加绿色边框 */
     div[data-testid="column"]:nth-of-type(1) .stButton > button {
-        border-color: #006400 !important; /* 深绿边框 */
+        border-color: #006400 !important; 
     }
-    /* 鼠标悬停 START：变绿底白字 */
+    /* 鼠标悬停 START */
     div[data-testid="column"]:nth-of-type(1) .stButton > button:hover {
         background-color: #006400 !important;
         color: #FFFFFF !important;
@@ -130,9 +129,9 @@ st.markdown("""
 
     /* 右侧 STOP 按钮：加红色边框 */
     div[data-testid="column"]:nth-of-type(2) .stButton > button {
-        border-color: #8B0000 !important; /* 深红边框 */
+        border-color: #8B0000 !important; 
     }
-    /* 鼠标悬停 STOP：变红底白字 */
+    /* 鼠标悬停 STOP */
     div[data-testid="column"]:nth-of-type(2) .stButton > button:hover {
         background-color: #8B0000 !important;
         color: #FFFFFF !important;
@@ -181,7 +180,7 @@ def render_cards(sbp, dbp):
     """
     cards_placeholder.markdown(html_code, unsafe_allow_html=True)
 
-render_cards(0, 0)
+render_cards(120, 70)
 
 st.markdown("<br>", unsafe_allow_html=True)
 info_text_placeholder = st.empty()
@@ -210,7 +209,7 @@ if stop_clicked:
 if st.session_state.running:
     # --- SCG 波形设置 ---
     window_size = 1000 
-    step = 10          
+    step = 30           
     sleep_time = 0.01   
     
     # --- 血压更新设置 ---
@@ -259,8 +258,16 @@ if st.session_state.running:
         
         if elapsed_time >= cycle_duration:
             st.session_state.measure_count += 1
-            current_sbp = random.randint(119, 121)
-            current_dbp = random.randint(68, 71)
+            
+            # 【核心修改】判断是否超过 18 次
+            if st.session_state.measure_count > 18:
+                # 超过18次，固定数值
+                current_sbp = 120
+                current_dbp = 70
+            else:
+                # 18次及以内，随机波动
+                current_sbp = random.randint(119, 121)
+                current_dbp = random.randint(68, 71)
             
             render_cards(current_sbp, current_dbp)
             info_text_placeholder.markdown(
@@ -273,5 +280,3 @@ if st.session_state.running:
         
         progress_bar.progress(min(progress_ratio, 1.0))
         time.sleep(sleep_time)
-
-
