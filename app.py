@@ -181,7 +181,7 @@ def render_cards(sbp, dbp):
     """
     cards_placeholder.markdown(html_code, unsafe_allow_html=True)
 
-render_cards(120, 70)
+render_cards(0, 0)
 
 st.markdown("<br>", unsafe_allow_html=True)
 info_text_placeholder = st.empty()
@@ -273,4 +273,5 @@ if st.session_state.running:
         
         progress_bar.progress(min(progress_ratio, 1.0))
         time.sleep(sleep_time)
+
 
