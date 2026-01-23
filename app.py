@@ -103,37 +103,39 @@ st.markdown("""
     .card-value { font-size: 42px; font-weight: bold; line-height: 1.1; margin: 2px 0; text-shadow: 0 0 8px currentColor; }
     .card-unit { font-size: 12px; opacity: 0.8; line-height: 1.2; }
     
-    /* 5. 按钮样式修复 【核心修复区域】 */
-    /* 针对所有按钮的基础样式 */
+    /* 5. 按钮样式修复 【核心修改：白底黑字】 */
+    
+    /* 所有按钮的基础样式：白底、黑字、加粗 */
     div.stButton > button {
+        background-color: #FFFFFF !important; /* 强制白底 */
+        color: #000000 !important;            /* 强制黑字 */
         width: 100%;
         border-radius: 8px;
         height: 45px;
         font-weight: bold;
         font-size: 16px;
+        border: 2px solid transparent !important; /* 预留边框位置 */
         transition: all 0.3s ease;
     }
 
-    /* 左侧 START 按钮：强制深绿背景，白字 */
+    /* 左侧 START 按钮：加绿色边框 */
     div[data-testid="column"]:nth-of-type(1) .stButton > button {
-        background-color: #006400 !important; /* 深绿色 */
-        color: #FFFFFF !important;            /* 纯白色文字 */
-        border: 1px solid #00FF00 !important; /* 亮绿边框 */
+        border-color: #006400 !important; /* 深绿边框 */
     }
+    /* 鼠标悬停 START：变绿底白字 */
     div[data-testid="column"]:nth-of-type(1) .stButton > button:hover {
-        background-color: #008000 !important;
-        box-shadow: 0 0 10px rgba(0,255,0,0.4);
+        background-color: #006400 !important;
+        color: #FFFFFF !important;
     }
 
-    /* 右侧 STOP 按钮：强制深红背景，白字 */
+    /* 右侧 STOP 按钮：加红色边框 */
     div[data-testid="column"]:nth-of-type(2) .stButton > button {
-        background-color: #8B0000 !important; /* 深红色 */
-        color: #FFFFFF !important;            /* 纯白色文字 */
-        border: 1px solid #FF0000 !important; /* 亮红边框 */
+        border-color: #8B0000 !important; /* 深红边框 */
     }
+    /* 鼠标悬停 STOP：变红底白字 */
     div[data-testid="column"]:nth-of-type(2) .stButton > button:hover {
-        background-color: #B22222 !important;
-        box-shadow: 0 0 10px rgba(255,0,0,0.4);
+        background-color: #8B0000 !important;
+        color: #FFFFFF !important;
     }
     
     /* 6. 状态文字 */
