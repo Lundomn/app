@@ -174,7 +174,7 @@ if stop_clicked:
 if st.session_state.running:
     # --- SCG 波形设置 ---
     window_size = 1000 
-    step = 30           # 保持大步长以平衡性能
+    step = 10           # 保持大步长以平衡性能
     sleep_time = 0.01   # 保持低延迟
     
     # --- 血压更新设置 ---
@@ -239,3 +239,4 @@ if st.session_state.running:
         
         progress_bar.progress(min(progress_ratio, 1.0))
         time.sleep(sleep_time)
+
