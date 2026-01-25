@@ -40,32 +40,23 @@ st.set_page_config(page_title="SCG Monitor", layout="centered")
 
 st.markdown("""
 <style>
-    /* 【核心修改】强制消除 Streamlit 默认顶部留白 */
+    /* 强制消除顶部留白 */
     .block-container {
         padding-top: 0rem !important;
         padding-bottom: 1rem !important;
         max-width: 100%;
     }
-    
-    /* 隐藏 Streamlit 顶部的装饰条和菜单占位 */
     header[data-testid="stHeader"] {
         display: none !important;
     }
-
     .stApp { background-color: #0E1117; color: #FAFAFA; }
     
     .header-text {
         font-size: 26px; font-weight: 700; color: #E0E0E0; 
-        text-align: center; 
-        padding: 10px 0; /* 缩小标题上下边距 */
-        margin-top: 0px;
-        background: rgba(255,255,255,0.05); /* 增加淡淡的底色凸显置顶感 */
-        border-bottom: 1px solid #333;
-        text-shadow: 0 0 10px rgba(255,255,255,0.1);
+        text-align: center; padding: 10px 0; margin-top: 0px;
+        background: rgba(255,255,255,0.05); border-bottom: 1px solid #333;
     }
     
-    .section-line { border-top: 1px solid #333; margin: 15px 0; }
-
     .cards-container {
         display: flex; flex-direction: row; justify-content: center; 
         gap: 15px; width: 100%; margin-top: 5px;
@@ -73,9 +64,8 @@ st.markdown("""
     
     .bp-card {
         border-radius: 12px; padding: 12px; text-align: center; 
-        box-shadow: 0 4px 15px rgba(0,0,0,0.5); 
-        width: 46%; display: flex; flex-direction: column; 
-        justify-content: center; align-items: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.5); width: 46%; 
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
     }
     
     .card-sbp { background: linear-gradient(145deg, #0c2b10, #051a06); border: 1px solid #00ff00; }
@@ -89,7 +79,6 @@ st.markdown("""
     .final-card { height: 180px; width: 42%; }
     .final-val { font-size: 60px; }
 
-    /* 按钮样式保持 */
     div.stButton > button { 
         background-color: #eee !important; color: #000 !important; 
         border-radius: 8px; height: 40px; font-weight: 600; 
@@ -107,48 +96,43 @@ st.markdown("""
 if 'running' not in st.session_state: st.session_state.running = False
 if 'measure_count' not in st.session_state: st.session_state.measure_count = 0 
 if 'finished' not in st.session_state: st.session_state.finished = False
-if 'final_sbp' not in st.session_state: st.session_state.final_sbp = 120
-if 'final_dbp' not in st.session_state: st.session_state.final_dbp = 80
+if 'final_sbp' not in st.session_state: st.session_state.final_sbp = 0
+if 'final_dbp' not in st.session_state: st.session_state.final_dbp = 0
 
 data_path = "demo"
 all_x = load_all_data(data_path)
 
 # ==================== 逻辑分支 ====================
 
-# 【场景 A】测量完成
 if st.session_state.finished:
     st.markdown('<div class="header-text">📋 Final Clinical Report</div>', unsafe_allow_html=True)
-    
     st.markdown(f"""
     <div class="cards-container" style="margin-top:30px;">
         <div class="bp-card card-sbp final-card">
-            <div class="title-sbp">Systolic (SBP)</div>
+            <div class="title-sbp">Average SBP</div>
             <div class="val-sbp final-val">{st.session_state.final_sbp}</div>
             <div style="color:#88ff88; opacity:0.7;">mmHg</div>
         </div>
         <div class="bp-card card-dbp final-card">
-            <div class="title-dbp">Diastolic (DBP)</div>
+            <div class="title-dbp">Average DBP</div>
             <div class="val-dbp final-val">{st.session_state.final_dbp}</div>
             <div style="color:#88ff88; opacity:0.7;">mmHg</div>
         </div>
     </div>
+    <div style='text-align:center; color:#888; margin-top:15px;'>Result calculated from 18 measurement cycles.</div>
     """, unsafe_allow_html=True)
 
-    st.markdown("<br><br>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
     if st.button("🔄 RESTART NEW SESSION", use_container_width=True):
         st.session_state.measure_count = 0
         st.session_state.finished = False
         st.session_state.running = False
         st.rerun()
 
-# 【场景 B】正在测量/待机
 else:
-    # 标题置顶
     st.markdown('<div class="header-text">💚 Cardiac Real-time Monitor</div>', unsafe_allow_html=True)
     
-    # 紧接着就是图表
     chart_placeholder = st.empty()
-    
     cards_placeholder = st.empty()
     
     def render_live_cards(sbp, dbp):
@@ -170,19 +154,17 @@ else:
     render_live_cards(0, 0)
     
     status_text = st.empty()
-    status_text.markdown(f"<div style='color:#888; text-align:center; margin-top:10px;'>Ready. Count: {st.session_state.measure_count}</div>", unsafe_allow_html=True)
+    status_text.markdown(f"<div style='color:#888; text-align:center; margin-top:5px;'>Ready. Count: {st.session_state.measure_count}</div>", unsafe_allow_html=True)
     
     prog_bar = st.progress(0)
     
-    st.markdown("<div style='margin-top:15px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-top:10px;'></div>", unsafe_allow_html=True)
     
     _, mid_col, _ = st.columns([1, 4, 1]) 
     with mid_col:
         c1, c2 = st.columns(2)
-        with c1:
-            start = st.button("START", use_container_width=True)
-        with c2:
-            stop = st.button("STOP", use_container_width=True)
+        with c1: start = st.button("START", use_container_width=True)
+        with c2: stop = st.button("STOP", use_container_width=True)
     
     if start: st.session_state.running = True
     if stop: st.session_state.running = False
@@ -190,8 +172,8 @@ else:
     if st.session_state.running:
         # 固定序列逻辑
         random.seed(42) 
-        fixed_sbp_seq = [random.randint(122, 124) for _ in range(20)]
-        fixed_dbp_seq = [random.randint(70, 73) for _ in range(20)]
+        fixed_sbp_seq = [random.randint(122, 124) for _ in range(18)]
+        fixed_dbp_seq = [random.randint(70, 73) for _ in range(18)]
         
         window = 2000
         step = 50
@@ -201,7 +183,7 @@ else:
         base = alt.Chart(pd.DataFrame({'y':[], 'x':[]})).mark_line(color='#00FF00', strokeWidth=2).encode(
             x=alt.X('x', axis=None),
             y=alt.Y('y', axis=None, scale=alt.Scale(domain=[0, 1]))
-        ).properties(height=200, background='#000')
+        ).properties(height=180, background='#000')
 
         loop_counter = 0
 
@@ -218,18 +200,20 @@ else:
             if elapsed >= cycle_duration:
                 st.session_state.measure_count += 1
                 
+                # 结束判定并计算平均值取整
                 if st.session_state.measure_count >= 18:
-                    st.session_state.final_sbp = random.randint(118, 122)
-                    st.session_state.final_dbp = random.randint(68, 72)
+                    # === 【核心逻辑：平均值取整】 ===
+                    st.session_state.final_sbp = int(round(np.mean(fixed_sbp_seq)))
+                    st.session_state.final_dbp = int(round(np.mean(fixed_dbp_seq)))
+                    
                     st.session_state.finished = True
                     st.session_state.running = False
                     st.rerun() 
                 
                 idx = st.session_state.measure_count - 1
-                idx = max(0, min(idx, 17))
-                
                 render_live_cards(fixed_sbp_seq[idx], fixed_dbp_seq[idx])
-                status_text.markdown(f"<div style='color:#888; text-align:center; margin-top:10px;'>Measuring... Count: <b>{st.session_state.measure_count}</b></div>", unsafe_allow_html=True)
+                
+                status_text.markdown(f"<div style='color:#888; text-align:center; margin-top:5px;'>Measuring... Count: <b>{st.session_state.measure_count}</b></div>", unsafe_allow_html=True)
                 cycle_start = now
             
             if loop_counter % 5 == 0:
@@ -238,4 +222,3 @@ else:
 
             loop_counter += 1
             time.sleep(0.01)
-
