@@ -63,10 +63,12 @@ st.markdown("""
         transition: transform 0.3s ease;
     }
     
-    .card-sbp { background: linear-gradient(145deg, #2b0c0c, #1a0505); border: 1px solid #ff4b4b; }
-    .val-sbp { color: #ff4b4b; font-size: 48px; font-weight: bold; text-shadow: 0 0 10px rgba(255, 75, 75, 0.4); }
-    .title-sbp { color: #ff8888; font-size: 18px; font-weight: bold; }
+    /* --- SBP 绿色系 (修改处) --- */
+    .card-sbp { background: linear-gradient(145deg, #0c2b10, #051a06); border: 1px solid #00ff00; }
+    .val-sbp { color: #00ff00; font-size: 48px; font-weight: bold; text-shadow: 0 0 10px rgba(0, 255, 0, 0.4); }
+    .title-sbp { color: #88ff88; font-size: 18px; font-weight: bold; }
     
+    /* --- DBP 绿色系 --- */
     .card-dbp { background: linear-gradient(145deg, #0c2b10, #051a06); border: 1px solid #00ff00; }
     .val-dbp { color: #00ff00; font-size: 48px; font-weight: bold; text-shadow: 0 0 10px rgba(0, 255, 0, 0.4); }
     .title-dbp { color: #88ff88; font-size: 18px; font-weight: bold; }
@@ -74,13 +76,13 @@ st.markdown("""
     .final-card { height: 200px; width: 40%; }
     .final-val { font-size: 64px; }
 
-    /* --- 按钮样式修改 (缩小至标准尺寸) --- */
+    /* --- 按钮样式 (保持小尺寸居中) --- */
     div.stButton > button { 
         background-color: #eee !important; color: #000 !important; 
-        border-radius: 8px; /* 圆角稍微改小 */
-        height: 42px; /* 高度调小 */
-        font-weight: 600; /* 字体粗细正常化 */
-        font-size: 16px; /* 字体调小 */
+        border-radius: 8px;
+        height: 42px; 
+        font-weight: 600; 
+        font-size: 16px; 
         border: 2px solid transparent !important;
         transition: all 0.2s ease-in-out;
     }
@@ -130,7 +132,7 @@ if st.session_state.finished:
         <div class="bp-card card-sbp final-card">
             <div class="title-sbp">Systolic (SBP)</div>
             <div class="val-sbp final-val">{st.session_state.final_sbp}</div>
-            <div style="color:#ff8888; opacity:0.7;">mmHg</div>
+            <div style="color:#88ff88; opacity:0.7;">mmHg</div>
         </div>
         <div class="bp-card card-dbp final-card">
             <div class="title-dbp">Diastolic (DBP)</div>
@@ -165,7 +167,7 @@ else:
             <div class="bp-card card-sbp">
                 <div class="title-sbp">SBP</div>
                 <div class="val-sbp">{sbp}</div>
-                <div style="color:#ff8888; font-size:12px;">mmHg</div>
+                <div style="color:#88ff88; font-size:12px;">mmHg</div>
             </div>
             <div class="bp-card card-dbp">
                 <div class="title-dbp">DBP</div>
@@ -185,7 +187,7 @@ else:
     
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # --- 按钮布局 (调整中间列比例，让按钮更紧凑) ---
+    # --- 按钮布局 ---
     _, mid_col, _ = st.columns([1.5, 3, 1.5]) 
     
     with mid_col:
@@ -201,8 +203,8 @@ else:
     # --- 主循环 ---
     if st.session_state.running:
         window = 1000
-        step = 10
-        cycle_duration = 2 
+        step = 20
+        cycle_duration = 1.5 
         cycle_start = time.time()
         
         base = alt.Chart(pd.DataFrame({'y':[], 'x':[]})).mark_line(color='#00FF00', strokeWidth=2).encode(
@@ -240,4 +242,3 @@ else:
             p = min(elapsed / cycle_duration, 1.0)
             prog_bar.progress(p)
             time.sleep(0.01)
-
