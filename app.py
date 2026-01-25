@@ -202,8 +202,8 @@ else:
 
     # --- 核心优化逻辑 ---
     if st.session_state.running:
-        window = 1000
-        step = 15          # 保持不变
+        window = 2000
+        step = 50         # 保持不变
         cycle_duration = 1.5 
         cycle_start = time.time()
         
@@ -256,3 +256,4 @@ else:
 
             loop_counter += 1
             time.sleep(0.01)
+
