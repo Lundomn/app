@@ -175,7 +175,7 @@ else:
         """, unsafe_allow_html=True)
 
     # 初始不显示0，显示一个起始范围值
-    render_live_cards(115, 75)
+    render_live_cards(125, 75)
     
     st.markdown("<br>", unsafe_allow_html=True)
     status_text = st.empty()
@@ -201,7 +201,7 @@ else:
     # --- 核心优化逻辑 ---
     if st.session_state.running:
         window = 2000
-        step = 15          # 【用户要求】保持不变
+        step = 20          # 【用户要求】保持不变
         cycle_duration = 1.5 
         cycle_start = time.time()
         
@@ -253,6 +253,7 @@ else:
 
             loop_counter += 1
             time.sleep(0.01)
+
 
 
 
