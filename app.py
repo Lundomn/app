@@ -167,7 +167,7 @@ else:
         </div>
         """, unsafe_allow_html=True)
 
-    render_live_cards(115, 75)
+    render_live_cards(0, 0)
     
     status_text = st.empty()
     status_text.markdown(f"<div style='color:#888; text-align:center; margin-top:10px;'>Ready. Count: {st.session_state.measure_count}</div>", unsafe_allow_html=True)
@@ -238,3 +238,4 @@ else:
 
             loop_counter += 1
             time.sleep(0.01)
+
