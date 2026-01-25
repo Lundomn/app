@@ -202,7 +202,7 @@ else:
     if st.session_state.running:
         window = 1000
         step = 15          # 【用户要求】保持不变
-        cycle_duration = 2.5 
+        cycle_duration = 1.5 
         cycle_start = time.time()
         
         # 预编译 Chart 对象
@@ -253,3 +253,4 @@ else:
 
             loop_counter += 1
             time.sleep(0.01)
+
