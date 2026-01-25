@@ -175,11 +175,13 @@ else:
         """, unsafe_allow_html=True)
 
     # 初始不显示0，显示一个起始范围值
-    render_live_cards(0, 0)
+    render_live_cards(115, 75)
     
     st.markdown("<br>", unsafe_allow_html=True)
     status_text = st.empty()
-    status_text.markdown(f"<div style='color:#888; text-align:center;'>Ready. Count: {st.session_state.measure_count}/18</div>", unsafe_allow_html=True)
+    
+    # 【修改点 1】: 初始只显示 Count: 0，不显示 /18
+    status_text.markdown(f"<div style='color:#888; text-align:center;'>Ready. Count: {st.session_state.measure_count}</div>", unsafe_allow_html=True)
     
     prog_bar = st.progress(0)
     
@@ -200,8 +202,8 @@ else:
 
     # --- 核心优化逻辑 ---
     if st.session_state.running:
-        window = 2000
-        step = 20          # 【用户要求】保持不变
+        window = 1000
+        step = 15          # 保持不变
         cycle_duration = 1.5 
         cycle_start = time.time()
         
@@ -217,7 +219,7 @@ else:
         for i in range(0, len(all_x) - window, step):
             if not st.session_state.running: break
             
-            # 1. 渲染波形 (每一帧都做，保证波形连贯)
+            # 1. 渲染波形
             batch = all_x[i : i+window]
             chart_df = pd.DataFrame({'y': batch, 'x': np.arange(len(batch))})
             chart_placeholder.altair_chart(base.properties(data=chart_df), use_container_width=True)
@@ -238,27 +240,19 @@ else:
                     st.session_state.running = False
                     st.rerun() 
                 
-                # 【关键修改】数值更新移到这里（一个周期只变一次）
-                curr_sbp = random.randint(125, 128)
-                curr_dbp = random.randint(72, 76)
+                # 数值更新移到这里（一个周期只变一次）
+                curr_sbp = random.randint(110, 130)
+                curr_dbp = random.randint(70, 85)
                 render_live_cards(curr_sbp, curr_dbp)
                 
-                status_text.markdown(f"<div style='color:#888; text-align:center;'>Measuring... Count: <b>{st.session_state.measure_count} / 18</b></div>", unsafe_allow_html=True)
+                # 【修改点 2】: 测量中只显示 Count: X，不显示 /18
+                status_text.markdown(f"<div style='color:#888; text-align:center;'>Measuring... Count: <b>{st.session_state.measure_count}</b></div>", unsafe_allow_html=True)
                 cycle_start = now # 重置计时
             
-            # 4. 进度条更新 (每5帧渲染一次dom，避免卡顿，但逻辑是连续的)
+            # 4. 进度条更新
             if loop_counter % 5 == 0:
                 p = min(elapsed / cycle_duration, 1.0)
                 prog_bar.progress(p)
 
             loop_counter += 1
             time.sleep(0.01)
-
-
-
-
-
-
-
-
-
