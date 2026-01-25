@@ -174,13 +174,13 @@ else:
         </div>
         """, unsafe_allow_html=True)
 
-    # 初始不显示0，显示一个起始范围值
-    render_live_cards(0, 0)
+    # 初始显示一个起始范围值
+    render_live_cards(115, 75)
     
     st.markdown("<br>", unsafe_allow_html=True)
     status_text = st.empty()
     
-    # 【修改点 1】: 初始只显示 Count: 0，不显示 /18
+    # 初始只显示 Count: 0
     status_text.markdown(f"<div style='color:#888; text-align:center;'>Ready. Count: {st.session_state.measure_count}</div>", unsafe_allow_html=True)
     
     prog_bar = st.progress(0)
@@ -202,8 +202,15 @@ else:
 
     # --- 核心优化逻辑 ---
     if st.session_state.running:
+        # === 【新增逻辑】生成固定序列 ===
+        # 使用固定的种子 (seed=42)，确保每次点击Start后，生成的18个数字顺序完全一样
+        random.seed(42) 
+        # 生成两个列表，分别包含20个预设值（虽然只用18个）
+        fixed_sbp_seq = [random.randint(122, 124) for _ in range(20)]
+        fixed_dbp_seq = [random.randint(70, 73) for _ in range(20)]
+        
         window = 2000
-        step = 50         # 保持不变
+        step = 50          # 保持不变
         cycle_duration = 0.8
         cycle_start = time.time()
         
@@ -240,12 +247,19 @@ else:
                     st.session_state.running = False
                     st.rerun() 
                 
-                # 数值更新移到这里（一个周期只变一次）
-                curr_sbp = random.randint(122, 124)
-                curr_dbp = random.randint(70, 73)
+                # === 【修改点】从固定序列中取值 ===
+                # 获取当前是第几次 (index从0开始，所以用 count-1)
+                idx = st.session_state.measure_count - 1
+                # 边界保护
+                if idx < 0: idx = 0
+                if idx >= 18: idx = 17 
+                
+                curr_sbp = fixed_sbp_seq[idx]
+                curr_dbp = fixed_dbp_seq[idx]
+                
                 render_live_cards(curr_sbp, curr_dbp)
                 
-                # 【修改点 2】: 测量中只显示 Count: X，不显示 /18
+                # 测量中只显示 Count: X
                 status_text.markdown(f"<div style='color:#888; text-align:center;'>Measuring... Count: <b>{st.session_state.measure_count}</b></div>", unsafe_allow_html=True)
                 cycle_start = now # 重置计时
             
@@ -256,11 +270,3 @@ else:
 
             loop_counter += 1
             time.sleep(0.01)
-
-
-
-
-
-
-
-
