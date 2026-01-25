@@ -175,7 +175,7 @@ else:
         """, unsafe_allow_html=True)
 
     # 初始显示一个起始范围值
-    render_live_cards(115, 75)
+    render_live_cards(0, 0)
     
     st.markdown("<br>", unsafe_allow_html=True)
     status_text = st.empty()
@@ -270,3 +270,4 @@ else:
 
             loop_counter += 1
             time.sleep(0.01)
+
