@@ -241,7 +241,7 @@ else:
                     st.rerun() 
                 
                 # 数值更新移到这里（一个周期只变一次）
-                curr_sbp = random.randint(122, 125)
+                curr_sbp = random.randint(122, 124)
                 curr_dbp = random.randint(70, 73)
                 render_live_cards(curr_sbp, curr_dbp)
                 
@@ -256,6 +256,7 @@ else:
 
             loop_counter += 1
             time.sleep(0.01)
+
 
 
 
