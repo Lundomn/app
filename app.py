@@ -202,7 +202,7 @@ else:
     if st.session_state.running:
         window = 1000
         step = 10
-        cycle_duration = 1.5 
+        cycle_duration = 2 
         cycle_start = time.time()
         
         base = alt.Chart(pd.DataFrame({'y':[], 'x':[]})).mark_line(color='#00FF00', strokeWidth=2).encode(
@@ -240,3 +240,4 @@ else:
             p = min(elapsed / cycle_duration, 1.0)
             prog_bar.progress(p)
             time.sleep(0.01)
+
