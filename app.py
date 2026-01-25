@@ -175,7 +175,7 @@ else:
         """, unsafe_allow_html=True)
 
     # 初始不显示0，显示一个起始范围值
-    render_live_cards(125, 75)
+    render_live_cards(0, 0)
     
     st.markdown("<br>", unsafe_allow_html=True)
     status_text = st.empty()
@@ -239,8 +239,8 @@ else:
                     st.rerun() 
                 
                 # 【关键修改】数值更新移到这里（一个周期只变一次）
-                curr_sbp = random.randint(110, 130)
-                curr_dbp = random.randint(70, 85)
+                curr_sbp = random.randint(125, 128)
+                curr_dbp = random.randint(72, 76)
                 render_live_cards(curr_sbp, curr_dbp)
                 
                 status_text.markdown(f"<div style='color:#888; text-align:center;'>Measuring... Count: <b>{st.session_state.measure_count} / 18</b></div>", unsafe_allow_html=True)
@@ -253,6 +253,7 @@ else:
 
             loop_counter += 1
             time.sleep(0.01)
+
 
 
 
