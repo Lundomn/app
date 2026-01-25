@@ -63,12 +63,12 @@ st.markdown("""
         transition: transform 0.3s ease;
     }
     
-    /* SBP 绿色系 */
+    /* --- SBP 绿色系 (一致) --- */
     .card-sbp { background: linear-gradient(145deg, #0c2b10, #051a06); border: 1px solid #00ff00; }
     .val-sbp { color: #00ff00; font-size: 48px; font-weight: bold; text-shadow: 0 0 10px rgba(0, 255, 0, 0.4); }
     .title-sbp { color: #88ff88; font-size: 18px; font-weight: bold; }
     
-    /* DBP 绿色系 */
+    /* --- DBP 绿色系 (一致) --- */
     .card-dbp { background: linear-gradient(145deg, #0c2b10, #051a06); border: 1px solid #00ff00; }
     .val-dbp { color: #00ff00; font-size: 48px; font-weight: bold; text-shadow: 0 0 10px rgba(0, 255, 0, 0.4); }
     .title-dbp { color: #88ff88; font-size: 18px; font-weight: bold; }
@@ -76,6 +76,7 @@ st.markdown("""
     .final-card { height: 200px; width: 40%; }
     .final-val { font-size: 64px; }
 
+    /* --- 按钮样式 (标准尺寸 + 居中) --- */
     div.stButton > button { 
         background-color: #eee !important; color: #000 !important; 
         border-radius: 8px;
@@ -118,6 +119,7 @@ all_x = load_all_data(data_path)
 
 # ==================== 逻辑分支 ====================
 
+# 【场景 A】测量完成
 if st.session_state.finished:
     st.markdown('<div class="header-text">📋 Final Clinical Report</div>', unsafe_allow_html=True)
     st.markdown('<div class="section-line"></div>', unsafe_allow_html=True)
@@ -147,6 +149,7 @@ if st.session_state.finished:
         st.session_state.running = False
         st.rerun()
 
+# 【场景 B】正在测量/待机
 else:
     st.markdown('<div class="header-text">💚 Cardiac Real-time Monitor</div>', unsafe_allow_html=True)
     
@@ -161,7 +164,7 @@ else:
             <div class="bp-card card-sbp">
                 <div class="title-sbp">SBP</div>
                 <div class="val-sbp">{sbp}</div>
-                <div style="color:#ff8888; font-size:12px;">mmHg</div>
+                <div style="color:#88ff88; font-size:12px;">mmHg</div>
             </div>
             <div class="bp-card card-dbp">
                 <div class="title-dbp">DBP</div>
@@ -171,6 +174,7 @@ else:
         </div>
         """, unsafe_allow_html=True)
 
+    # 初始显示
     render_live_cards(0, 0)
     
     st.markdown("<br>", unsafe_allow_html=True)
@@ -181,6 +185,7 @@ else:
     
     st.markdown("<br>", unsafe_allow_html=True)
     
+    # --- 按钮居中布局 ---
     _, mid_col, _ = st.columns([1.5, 3, 1.5]) 
     
     with mid_col:
@@ -193,65 +198,59 @@ else:
     if start: st.session_state.running = True
     if stop: st.session_state.running = False
 
-    # --- 主循环优化版 ---
+    # --- 核心优化逻辑 ---
     if st.session_state.running:
         window = 1000
-        # 【优化1】步长加大，减少渲染次数，但波形移动视觉效果不变
-        step = 40 
+        step = 20          # 【用户要求】保持不变
         cycle_duration = 1.5 
         cycle_start = time.time()
         
-        # 预设图表对象
-        base = alt.Chart(pd.DataFrame({'y':[], 'x':[]})).mark_line(
-            color='#00FF00', 
-            strokeWidth=2,
-            interpolate='linear' # 线性插值，渲染更快
-        ).encode(
+        # 预编译 Chart 对象
+        base = alt.Chart(pd.DataFrame({'y':[], 'x':[]})).mark_line(color='#00FF00', strokeWidth=2).encode(
             x=alt.X('x', axis=None),
             y=alt.Y('y', axis=None, scale=alt.Scale(domain=[0, 1]))
-        ).properties(
-            height=180, 
-            background='#000'
-        ).configure_axis(
-            grid=False # 移除网格，提升性能
-        ).configure_view(
-            strokeWidth=0 # 移除边框
-        )
+        ).properties(height=180, background='#000')
 
+        loop_counter = 0
+
+        # 主循环
         for i in range(0, len(all_x) - window, step):
             if not st.session_state.running: break
             
-            # A. 数据分片
+            # 1. 渲染波形 (每一帧都做，保证波形连贯)
             batch = all_x[i : i+window]
-            # 为了性能，可以稍微降低一点点采样率（可选，目前保留全量）
             chart_df = pd.DataFrame({'y': batch, 'x': np.arange(len(batch))})
-            
-            # B. 渲染
             chart_placeholder.altair_chart(base.properties(data=chart_df), use_container_width=True)
             
-            # C. 业务逻辑
+            # 2. 逻辑检测
             now = time.time()
             elapsed = now - cycle_start
             
-            if elapsed >= cycle_duration:
-                st.session_state.measure_count += 1
+            # 3. 【性能优化】每5帧更新一次文字和卡片
+            # 这样既不改step，又能缓解Streamlit渲染HTML带来的卡顿
+            if loop_counter % 5 == 0:
+                if elapsed >= cycle_duration:
+                    st.session_state.measure_count += 1
+                    
+                    if st.session_state.measure_count >= 18:
+                        st.session_state.final_sbp = random.randint(118, 122)
+                        st.session_state.final_dbp = random.randint(68, 72)
+                        st.session_state.finished = True
+                        st.session_state.running = False
+                        st.rerun() 
+                    
+                    status_text.markdown(f"<div style='color:#888; text-align:center;'>Measuring... Count: <b>{st.session_state.measure_count} / 18</b></div>", unsafe_allow_html=True)
+                    cycle_start = now
                 
-                if st.session_state.measure_count >= 18:
-                    st.session_state.final_sbp = random.randint(118, 122)
-                    st.session_state.final_dbp = random.randint(68, 72)
-                    st.session_state.finished = True
-                    st.session_state.running = False
-                    st.rerun() 
-                
+                # 更新卡片数值
                 curr_sbp = random.randint(110, 130)
                 curr_dbp = random.randint(70, 85)
                 render_live_cards(curr_sbp, curr_dbp)
-                
-                status_text.markdown(f"<div style='color:#888; text-align:center;'>Measuring... Count: <b>{st.session_state.measure_count} / 18</b></div>", unsafe_allow_html=True)
-                cycle_start = now
-            
-            p = min(elapsed / cycle_duration, 1.0)
-            prog_bar.progress(p)
-            
-            # 【优化2】给予浏览器喘息时间 (30ms 左右最稳)
-            time.sleep(0.03)
+
+                # 更新进度条
+                p = min(elapsed / cycle_duration, 1.0)
+                prog_bar.progress(p)
+
+            loop_counter += 1
+            # 稍微缩短sleep时间来补偿step较小带来的速度感缺失，同时兼顾性能
+            time.sleep(0.01)
