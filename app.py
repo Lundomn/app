@@ -174,8 +174,8 @@ else:
         </div>
         """, unsafe_allow_html=True)
 
-    # 初始显示
-    render_live_cards(0, 0)
+    # 初始不显示0，显示一个起始范围值
+    render_live_cards(115, 75)
     
     st.markdown("<br>", unsafe_allow_html=True)
     status_text = st.empty()
@@ -202,7 +202,7 @@ else:
     if st.session_state.running:
         window = 1000
         step = 15          # 【用户要求】保持不变
-        cycle_duration = 1.5 
+        cycle_duration = 2.5 
         cycle_start = time.time()
         
         # 预编译 Chart 对象
@@ -226,33 +226,30 @@ else:
             now = time.time()
             elapsed = now - cycle_start
             
-            # 3. 【性能优化】每5帧更新一次文字和卡片
-            # 这样既不改step，又能缓解Streamlit渲染HTML带来的卡顿
-            if loop_counter % 5 == 0:
-                if elapsed >= cycle_duration:
-                    st.session_state.measure_count += 1
-                    
-                    if st.session_state.measure_count >= 18:
-                        st.session_state.final_sbp = random.randint(118, 122)
-                        st.session_state.final_dbp = random.randint(68, 72)
-                        st.session_state.finished = True
-                        st.session_state.running = False
-                        st.rerun() 
-                    
-                    status_text.markdown(f"<div style='color:#888; text-align:center;'>Measuring... Count: <b>{st.session_state.measure_count} / 18</b></div>", unsafe_allow_html=True)
-                    cycle_start = now
+            # 3. 周期判断：滑动（进度条）完成后才更新数值
+            if elapsed >= cycle_duration:
+                st.session_state.measure_count += 1
                 
-                # 更新卡片数值
+                # 结束判定
+                if st.session_state.measure_count >= 18:
+                    st.session_state.final_sbp = random.randint(118, 122)
+                    st.session_state.final_dbp = random.randint(68, 72)
+                    st.session_state.finished = True
+                    st.session_state.running = False
+                    st.rerun() 
+                
+                # 【关键修改】数值更新移到这里（一个周期只变一次）
                 curr_sbp = random.randint(110, 130)
                 curr_dbp = random.randint(70, 85)
                 render_live_cards(curr_sbp, curr_dbp)
-
-                # 更新进度条
+                
+                status_text.markdown(f"<div style='color:#888; text-align:center;'>Measuring... Count: <b>{st.session_state.measure_count} / 18</b></div>", unsafe_allow_html=True)
+                cycle_start = now # 重置计时
+            
+            # 4. 进度条更新 (每5帧渲染一次dom，避免卡顿，但逻辑是连续的)
+            if loop_counter % 5 == 0:
                 p = min(elapsed / cycle_duration, 1.0)
                 prog_bar.progress(p)
 
             loop_counter += 1
-            # 稍微缩短sleep时间来补偿step较小带来的速度感缺失，同时兼顾性能
             time.sleep(0.01)
-
-
