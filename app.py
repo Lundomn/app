@@ -40,69 +40,65 @@ st.set_page_config(page_title="SCG Monitor", layout="centered")
 
 st.markdown("""
 <style>
+    /* 【核心修改】强制消除 Streamlit 默认顶部留白 */
+    .block-container {
+        padding-top: 0rem !important;
+        padding-bottom: 1rem !important;
+        max-width: 100%;
+    }
+    
+    /* 隐藏 Streamlit 顶部的装饰条和菜单占位 */
+    header[data-testid="stHeader"] {
+        display: none !important;
+    }
+
     .stApp { background-color: #0E1117; color: #FAFAFA; }
     
     .header-text {
-        font-size: 24px; font-weight: 600; color: #E0E0E0; 
-        text-align: center; padding: 15px 0;
+        font-size: 26px; font-weight: 700; color: #E0E0E0; 
+        text-align: center; 
+        padding: 10px 0; /* 缩小标题上下边距 */
+        margin-top: 0px;
+        background: rgba(255,255,255,0.05); /* 增加淡淡的底色凸显置顶感 */
+        border-bottom: 1px solid #333;
         text-shadow: 0 0 10px rgba(255,255,255,0.1);
     }
     
-    .section-line { border-top: 1px solid #333; margin: 20px 0; }
+    .section-line { border-top: 1px solid #333; margin: 15px 0; }
 
     .cards-container {
         display: flex; flex-direction: row; justify-content: center; 
-        gap: 20px; width: 100%; margin-top: 10px;
+        gap: 15px; width: 100%; margin-top: 5px;
     }
     
     .bp-card {
-        border-radius: 15px; padding: 15px; text-align: center; 
+        border-radius: 12px; padding: 12px; text-align: center; 
         box-shadow: 0 4px 15px rgba(0,0,0,0.5); 
-        width: 45%; display: flex; flex-direction: column; 
+        width: 46%; display: flex; flex-direction: column; 
         justify-content: center; align-items: center;
-        transition: transform 0.3s ease;
     }
     
-    /* --- SBP 绿色系 (一致) --- */
     .card-sbp { background: linear-gradient(145deg, #0c2b10, #051a06); border: 1px solid #00ff00; }
-    .val-sbp { color: #00ff00; font-size: 48px; font-weight: bold; text-shadow: 0 0 10px rgba(0, 255, 0, 0.4); }
-    .title-sbp { color: #88ff88; font-size: 18px; font-weight: bold; }
+    .val-sbp { color: #00ff00; font-size: 44px; font-weight: bold; }
+    .title-sbp { color: #88ff88; font-size: 16px; font-weight: bold; }
     
-    /* --- DBP 绿色系 (一致) --- */
     .card-dbp { background: linear-gradient(145deg, #0c2b10, #051a06); border: 1px solid #00ff00; }
-    .val-dbp { color: #00ff00; font-size: 48px; font-weight: bold; text-shadow: 0 0 10px rgba(0, 255, 0, 0.4); }
-    .title-dbp { color: #88ff88; font-size: 18px; font-weight: bold; }
+    .val-dbp { color: #00ff00; font-size: 44px; font-weight: bold; }
+    .title-dbp { color: #88ff88; font-size: 16px; font-weight: bold; }
 
-    .final-card { height: 200px; width: 40%; }
-    .final-val { font-size: 64px; }
+    .final-card { height: 180px; width: 42%; }
+    .final-val { font-size: 60px; }
 
-    /* --- 按钮样式 (标准尺寸 + 居中) --- */
+    /* 按钮样式保持 */
     div.stButton > button { 
         background-color: #eee !important; color: #000 !important; 
-        border-radius: 8px;
-        height: 42px; 
-        font-weight: 600; 
-        font-size: 16px; 
-        border: 2px solid transparent !important;
-        transition: all 0.2s ease-in-out;
+        border-radius: 8px; height: 40px; font-weight: 600; 
     }
-    
     div[data-testid="column"]:nth-of-type(1) div.stButton > button {
         background-color: #e6ffe6 !important; color: #006400 !important; border-color: #00ff00 !important;
     }
-    div[data-testid="column"]:nth-of-type(1) div.stButton > button:hover {
-        background-color: #00ff00 !important; color: #ffffff !important; transform: scale(1.02);
-    }
-
     div[data-testid="column"]:nth-of-type(2) div.stButton > button {
         background-color: #ffe6e6 !important; color: #8b0000 !important; border-color: #ff4b4b !important;
-    }
-    div[data-testid="column"]:nth-of-type(2) div.stButton > button:hover {
-        background-color: #ff4b4b !important; color: #ffffff !important; transform: scale(1.02);
-    }
-    
-    div[data-testid="stVerticalBlock"] > div:last-child div.stButton > button {
-         background-color: #333 !important; color: #fff !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -122,10 +118,9 @@ all_x = load_all_data(data_path)
 # 【场景 A】测量完成
 if st.session_state.finished:
     st.markdown('<div class="header-text">📋 Final Clinical Report</div>', unsafe_allow_html=True)
-    st.markdown('<div class="section-line"></div>', unsafe_allow_html=True)
     
     st.markdown(f"""
-    <div class="cards-container">
+    <div class="cards-container" style="margin-top:30px;">
         <div class="bp-card card-sbp final-card">
             <div class="title-sbp">Systolic (SBP)</div>
             <div class="val-sbp final-val">{st.session_state.final_sbp}</div>
@@ -136,9 +131,6 @@ if st.session_state.finished:
             <div class="val-dbp final-val">{st.session_state.final_dbp}</div>
             <div style="color:#88ff88; opacity:0.7;">mmHg</div>
         </div>
-    </div>
-    <div style="text-align:center; color:#888; margin-top:20px; font-size:14px;">
-        Measurement Cycle Completed Successfully.<br>Data saved to system logs.
     </div>
     """, unsafe_allow_html=True)
 
@@ -151,10 +143,11 @@ if st.session_state.finished:
 
 # 【场景 B】正在测量/待机
 else:
+    # 标题置顶
     st.markdown('<div class="header-text">💚 Cardiac Real-time Monitor</div>', unsafe_allow_html=True)
     
+    # 紧接着就是图表
     chart_placeholder = st.empty()
-    st.markdown("<br>", unsafe_allow_html=True)
     
     cards_placeholder = st.empty()
     
@@ -174,22 +167,16 @@ else:
         </div>
         """, unsafe_allow_html=True)
 
-    # 初始显示一个起始范围值
-    render_live_cards(0, 0)
+    render_live_cards(115, 75)
     
-    st.markdown("<br>", unsafe_allow_html=True)
     status_text = st.empty()
-    
-    # 初始只显示 Count: 0
-    status_text.markdown(f"<div style='color:#888; text-align:center;'>Ready. Count: {st.session_state.measure_count}</div>", unsafe_allow_html=True)
+    status_text.markdown(f"<div style='color:#888; text-align:center; margin-top:10px;'>Ready. Count: {st.session_state.measure_count}</div>", unsafe_allow_html=True)
     
     prog_bar = st.progress(0)
     
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-top:15px;'></div>", unsafe_allow_html=True)
     
-    # --- 按钮居中布局 ---
-    _, mid_col, _ = st.columns([1.5, 3, 1.5]) 
-    
+    _, mid_col, _ = st.columns([1, 4, 1]) 
     with mid_col:
         c1, c2 = st.columns(2)
         with c1:
@@ -200,46 +187,37 @@ else:
     if start: st.session_state.running = True
     if stop: st.session_state.running = False
 
-    # --- 核心优化逻辑 ---
     if st.session_state.running:
-        # === 【新增逻辑】生成固定序列 ===
-        # 使用固定的种子 (seed=42)，确保每次点击Start后，生成的18个数字顺序完全一样
+        # 固定序列逻辑
         random.seed(42) 
-        # 生成两个列表，分别包含20个预设值（虽然只用18个）
         fixed_sbp_seq = [random.randint(122, 124) for _ in range(20)]
         fixed_dbp_seq = [random.randint(70, 73) for _ in range(20)]
         
         window = 2000
-        step = 50          # 保持不变
+        step = 50
         cycle_duration = 0.8
         cycle_start = time.time()
         
-        # 预编译 Chart 对象
         base = alt.Chart(pd.DataFrame({'y':[], 'x':[]})).mark_line(color='#00FF00', strokeWidth=2).encode(
             x=alt.X('x', axis=None),
             y=alt.Y('y', axis=None, scale=alt.Scale(domain=[0, 1]))
-        ).properties(height=180, background='#000')
+        ).properties(height=200, background='#000')
 
         loop_counter = 0
 
-        # 主循环
         for i in range(0, len(all_x) - window, step):
             if not st.session_state.running: break
             
-            # 1. 渲染波形
             batch = all_x[i : i+window]
             chart_df = pd.DataFrame({'y': batch, 'x': np.arange(len(batch))})
             chart_placeholder.altair_chart(base.properties(data=chart_df), use_container_width=True)
             
-            # 2. 逻辑检测
             now = time.time()
             elapsed = now - cycle_start
             
-            # 3. 周期判断：滑动（进度条）完成后才更新数值
             if elapsed >= cycle_duration:
                 st.session_state.measure_count += 1
                 
-                # 结束判定
                 if st.session_state.measure_count >= 18:
                     st.session_state.final_sbp = random.randint(118, 122)
                     st.session_state.final_dbp = random.randint(68, 72)
@@ -247,27 +225,16 @@ else:
                     st.session_state.running = False
                     st.rerun() 
                 
-                # === 【修改点】从固定序列中取值 ===
-                # 获取当前是第几次 (index从0开始，所以用 count-1)
                 idx = st.session_state.measure_count - 1
-                # 边界保护
-                if idx < 0: idx = 0
-                if idx >= 18: idx = 17 
+                idx = max(0, min(idx, 17))
                 
-                curr_sbp = fixed_sbp_seq[idx]
-                curr_dbp = fixed_dbp_seq[idx]
-                
-                render_live_cards(curr_sbp, curr_dbp)
-                
-                # 测量中只显示 Count: X
-                status_text.markdown(f"<div style='color:#888; text-align:center;'>Measuring... Count: <b>{st.session_state.measure_count}</b></div>", unsafe_allow_html=True)
-                cycle_start = now # 重置计时
+                render_live_cards(fixed_sbp_seq[idx], fixed_dbp_seq[idx])
+                status_text.markdown(f"<div style='color:#888; text-align:center; margin-top:10px;'>Measuring... Count: <b>{st.session_state.measure_count}</b></div>", unsafe_allow_html=True)
+                cycle_start = now
             
-            # 4. 进度条更新
             if loop_counter % 5 == 0:
                 p = min(elapsed / cycle_duration, 1.0)
                 prog_bar.progress(p)
 
             loop_counter += 1
             time.sleep(0.01)
-
