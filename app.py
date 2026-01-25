@@ -201,7 +201,7 @@ else:
     # --- 核心优化逻辑 ---
     if st.session_state.running:
         window = 1000
-        step = 20          # 【用户要求】保持不变
+        step = 10          # 【用户要求】保持不变
         cycle_duration = 1.5 
         cycle_start = time.time()
         
@@ -254,3 +254,4 @@ else:
             loop_counter += 1
             # 稍微缩短sleep时间来补偿step较小带来的速度感缺失，同时兼顾性能
             time.sleep(0.01)
+
