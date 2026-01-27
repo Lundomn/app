@@ -176,7 +176,7 @@ else:
         fixed_dbp_seq = [random.randint(68, 70) for _ in range(18)]
         
         window = 2000
-        step = 50
+        step = 20
         cycle_duration = 0.9
         cycle_start = time.time()
         
@@ -222,6 +222,7 @@ else:
 
             loop_counter += 1
             time.sleep(0.01)
+
 
 
 
