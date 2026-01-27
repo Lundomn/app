@@ -172,8 +172,8 @@ else:
     if st.session_state.running:
         # 固定序列逻辑
         random.seed(42) 
-        fixed_sbp_seq = [random.randint(123, 125) for _ in range(18)]
-        fixed_dbp_seq = [random.randint(68, 70) for _ in range(18)]
+        fixed_sbp_seq = [random.randint(117, 119) for _ in range(18)]
+        fixed_dbp_seq = [random.randint(72, 74) for _ in range(18)]
         
         window = 2000
         step = 20
@@ -201,7 +201,7 @@ else:
                 st.session_state.measure_count += 1
                 
                 # 结束判定并计算平均值取整
-                if st.session_state.measure_count >= 18:
+                if st.session_state.measure_count >= 15:
                     # === 【核心逻辑：平均值取整】 ===
                     st.session_state.final_sbp = int(round(np.mean(fixed_sbp_seq)))
                     st.session_state.final_dbp = int(round(np.mean(fixed_dbp_seq)))
@@ -222,6 +222,7 @@ else:
 
             loop_counter += 1
             time.sleep(0.01)
+
 
 
 
