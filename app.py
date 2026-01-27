@@ -172,8 +172,8 @@ else:
     if st.session_state.running:
         # 固定序列逻辑
         random.seed(42) 
-        fixed_sbp_seq = [random.randint(130, 132) for _ in range(18)]
-        fixed_dbp_seq = [random.randint(65, 67) for _ in range(18)]
+        fixed_sbp_seq = [random.randint(125, 127) for _ in range(18)]
+        fixed_dbp_seq = [random.randint(68, 70) for _ in range(18)]
         
         window = 2000
         step = 20
@@ -222,6 +222,7 @@ else:
 
             loop_counter += 1
             time.sleep(0.01)
+
 
 
 
