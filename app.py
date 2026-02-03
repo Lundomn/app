@@ -177,7 +177,7 @@ else:
         
         window = 2000
         step = 12
-        cycle_duration = 0.9
+        cycle_duration = 2.4
         cycle_start = time.time()
         
         base = alt.Chart(pd.DataFrame({'y':[], 'x':[]})).mark_line(color='#00FF00', strokeWidth=2).encode(
@@ -222,6 +222,7 @@ else:
 
             loop_counter += 1
             time.sleep(0.01)
+
 
 
 
